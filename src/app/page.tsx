@@ -1,44 +1,51 @@
-import React, { useEffect, useRef, useState } from "react"
+"use client"
+
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { motion, useAnimation, useInView } from "framer-motion"
-import { Mail, Github, Linkedin, ExternalLink, ArrowUpRight } from "lucide-react"
+import {
+  Mail,
+  Github,
+  Linkedin,
+  ExternalLink,
+  ArrowUpRight,
+  Download,
+  Briefcase,
+  Code2,
+  Layers,
+  Rocket,
+  Globe,
+  FileText,
+  Star,
+  Award,
+  Calendar,
+} from "lucide-react"
 
 /**
- * Sleek, modern, responsive portfolio for a Software Engineer (New York).
- * - Tech: React + TailwindCSS + Framer Motion (animations)
- * - Design: minimalist, white bg, dark gray text, electric blue accent
- * - A11y: semantic HTML, ARIA labels, visible focus, prefers-reduced-motion
- * - Mobile-first: grid/flex responsive layout
- * - Sections: About, Skills, Projects, Experience, Contact
- * - Smooth scrolling & subtle hover/fade-in effects
- * - Placeholder content throughout (swap with real data)
+ * Full-fledged professional portfolio (TypeScript + App Router + Tailwind + Framer Motion)
+ * Sections:
+ * - Hero (CTA + quick stats)
+ * - Services / What I Do
+ * - Skills (compact chips w/ small logos)
+ * - Projects (filterable grid: All / Web / Data / Infra)
+ * - Case Studies (spotlight cards)
+ * - Experience (timeline)
+ * - Testimonials (quotes)
+ * - Credentials (certs & education)
+ * - Contact (form + socials)
+ * - Footer
  *
- * HOW TO USE:
- * 1) Drop this component into a Next.js / React app. For Next.js 13+, put it in app/page.tsx (or page.jsx) and export default PortfolioPage.
- * 2) Ensure TailwindCSS is installed. Add the accent color via CSS variables below or Tailwind config if desired.
- * 3) Replace placeholder content, images, and links.
+ * Accessibility: semantic sections, labeled controls, visible focus, skip link, reduced motion friendly.
+ * Design: minimalist, neutral grays, soft accent (electric blue), tight vertical rhythm.
  */
 
-// Accent & theme via CSS variables. You can move these into globals.css if preferred.
+/* --- tiny design utilities --- */
 const ThemeStyles = () => (
   <style>{`
-    :root {
-      --bg: #ffffff;
-      --text: #111827; /* gray-900 */
-      --muted: #6b7280; /* gray-500 */
-      --card: #f8fafc; /* slate-50 */
-      --border: #e5e7eb; /* gray-200 */
-      --accent: #0AE0FF; /* "electric blue" */
-    }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); }
     .focus-ring:focus { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 0.5rem; }
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   `}</style>
 )
 
-// Reusable section wrapper with enter-viewport animation
 function Section({
   id,
   ariaLabel,
@@ -50,27 +57,25 @@ function Section({
   className?: string
   children: React.ReactNode
 }) {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" })
   const controls = useAnimation()
-
   useEffect(() => {
     if (inView) controls.start("visible")
   }, [inView, controls])
-
   return (
     <section
       id={id}
       aria-label={ariaLabel}
-      className={`max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 ${className}`}
+      className={`mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8 ${className}`}
     >
       <motion.div
         ref={ref}
         initial="hidden"
         animate={controls}
         variants={{
-          hidden: { opacity: 0, y: 12 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+          hidden: { opacity: 0, y: 8 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
         }}
       >
         {children}
@@ -79,62 +84,50 @@ function Section({
   )
 }
 
-// Simple badge for tech stacks
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-xs font-medium text-[var(--muted)]">
+    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-medium text-zinc-600">
       {children}
     </span>
   )
 }
 
-// Navbar
+/* --- Navbar --- */
 function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [
     { href: "#about", label: "About" },
+    { href: "#services", label: "Services" },
     { href: "#skills", label: "Skills" },
     { href: "#projects", label: "Projects" },
+    { href: "#case-studies", label: "Case Studies" },
     { href: "#experience", label: "Experience" },
+    { href: "#testimonials", label: "Testimonials" },
+    { href: "#credentials", label: "Credentials" },
     { href: "#contact", label: "Contact" },
   ]
   return (
-    <header
-      className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-[var(--border)]"
-      role="banner"
-    >
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
       <nav
-        className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between h-16"
+        className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-5 sm:px-6 lg:px-8"
         aria-label="Primary"
       >
-        <a
-          href="#home"
-          className="font-semibold tracking-tight focus-ring"
-          aria-label="Home"
-        >
-          <span className="text-xl">NYC Engineer</span>
+        <a href="#home" className="focus-ring text-sm font-semibold tracking-tight">
+          JR • NYC
         </a>
         <button
           className="md:hidden p-2 rounded focus-ring"
-          aria-label="Toggle navigation menu"
+          aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
         >
-          <span className="sr-only">Menu</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M4 6h16M4 12h16M4 18h16"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          ☰
         </button>
-        <ul className="hidden md:flex items-center gap-6 text-sm">
+        <ul className="hidden md:flex items-center gap-5 text-sm">
           {links.map((l) => (
             <li key={l.href}>
               <a
-                className="hover:text-[var(--accent)] transition-colors focus-ring"
+                className="focus-ring text-zinc-700 hover:text-[var(--accent)] transition-colors"
                 href={l.href}
               >
                 {l.label}
@@ -144,7 +137,7 @@ function Navbar() {
         </ul>
       </nav>
       {open && (
-        <ul className="md:hidden border-t border-[var(--border)] px-5 pb-3 pt-2 space-y-2">
+        <ul className="md:hidden border-t border-[var(--border)] px-5 py-2 space-y-1 bg-white">
           {links.map((l) => (
             <li key={l.href}>
               <a
@@ -162,72 +155,70 @@ function Navbar() {
   )
 }
 
-// Hero
+/* --- Hero --- */
 function Hero() {
+  const stats = [
+    { label: "Years Experience", value: "7+" },
+    { label: "Projects Delivered", value: "30+" },
+    { label: "Production Uptime", value: "99.9%" },
+  ]
   return (
-    <div id="home" className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        {/* Electric blue rings */}
-        <div
-          className="absolute -top-24 -right-40 h-80 w-80 rounded-full blur-3xl opacity-30"
-          style={{
-            background: "radial-gradient(circle, var(--accent), transparent 60%)",
-          }}
-        />
-        <div
-          className="absolute -bottom-24 -left-40 h-80 w-80 rounded-full blur-3xl opacity-20"
-          style={{
-            background: "radial-gradient(circle, var(--accent), transparent 60%)",
-          }}
-        />
-      </div>
-
-      <Section id="about" ariaLabel="About Me" className="pt-16 sm:pt-20 lg:pt-24">
-        <div className="grid lg:grid-cols-[1.2fr,0.8fr] items-center gap-10">
+    <div id="home">
+      <Section id="about" ariaLabel="About Me" className="pt-10 sm:pt-12 lg:pt-16">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <motion.h1
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight"
+              transition={{ duration: 0.4 }}
+              className="text-4xl sm:text-5xl font-extrabold tracking-tight"
             >
-              Johar R Warsol
+              Eric Hang
             </motion.h1>
-            <p className="mt-3 text-xl text-[var(--muted)]">
-              Software Engineer · New York, NY
+            <p className="mt-2 text-lg text-zinc-600">Software Engineer · New York, NY</p>
+            <p className="mt-5 max-w-prose leading-relaxed text-zinc-700">
+              I craft reliable web platforms and performant backends. I combine design
+              sense with engineering rigor to ship scalable products that are fast,
+              accessible, and maintainable.
             </p>
-            <p className="mt-6 max-w-prose leading-relaxed">
-              I build fast, accessible web experiences and elegant backend systems. My
-              focus is crafting scalable products with a clean UX, modern tooling, and
-              thoughtful performance—so teams can ship with confidence.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center gap-2">
               <Badge>React</Badge>
               <Badge>TypeScript</Badge>
               <Badge>Node.js</Badge>
               <Badge>PostgreSQL</Badge>
               <Badge>Next.js</Badge>
             </div>
-            <div className="mt-8 flex gap-3">
+            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-3 font-semibold text-black shadow-sm transition hover:translate-y-[-1px] focus-ring"
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:-translate-y-0.5 focus-ring"
               >
-                View Projects <ArrowUpRight size={18} aria-hidden />
+                View Projects <ArrowUpRight size={16} aria-hidden />
               </a>
               <a
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-5 py-3 font-semibold transition hover:border-[var(--text)] focus-ring"
+                href="/resume.pdf"
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-2.5 text-sm font-semibold transition hover:border-zinc-800 focus-ring"
               >
-                Contact Me
+                <Download size={16} /> Download Résumé
               </a>
             </div>
+            <ul className="mt-8 grid grid-cols-3 gap-4 max-w-md">
+              {stats.map((s) => (
+                <li
+                  key={s.label}
+                  className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-3 text-center"
+                >
+                  <p className="text-xl font-semibold">{s.value}</p>
+                  <p className="text-xs text-zinc-600">{s.label}</p>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="justify-self-center">
             <img
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop"
               alt="Professional headshot placeholder"
-              className="h-48 w-48 sm:h-56 sm:w-56 rounded-2xl object-cover shadow-lg border border-[var(--border)]"
+              className="h-44 w-44 sm:h-52 sm:w-52 rounded-xl object-cover shadow border border-[var(--border)]"
             />
           </div>
         </div>
@@ -236,7 +227,51 @@ function Hero() {
   )
 }
 
-// Skills grid with icons (Devicon CDN placeholders)
+/* --- Services --- */
+function Services() {
+  const cards = [
+    {
+      icon: <Code2 size={18} />,
+      title: "Frontend Engineering",
+      desc: "Accessible, responsive UIs in React/Next.js with strong DX and test coverage.",
+    },
+    {
+      icon: <Layers size={18} />,
+      title: "Backend & APIs",
+      desc: "Robust REST/GraphQL services with Node/Java, SQL modeling, auth, and observability.",
+    },
+    {
+      icon: <Rocket size={18} />,
+      title: "Performance & DX",
+      desc: "Profiling, caching, CI/CD, and refactors that reduce latency and boost throughput.",
+    },
+    {
+      icon: <Globe size={18} />,
+      title: "Cloud & Infra",
+      desc: "Vercel, AWS, containers, and pragmatic infra-as-code for fast, safe deploys.",
+    },
+  ]
+  return (
+    <Section id="services" ariaLabel="Services" className="py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6">What I Do</h2>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((c) => (
+          <article
+            key={c.title}
+            className="rounded-xl border border-[var(--border)] bg-white p-4 transition hover:shadow-md"
+          >
+            <div className="flex items-center gap-2 text-zinc-700 mb-2">
+              {c.icon} <span className="font-semibold">{c.title}</span>
+            </div>
+            <p className="text-sm text-zinc-600 leading-relaxed">{c.desc}</p>
+          </article>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+/* --- Skills --- */
 function Skills() {
   const skills = [
     {
@@ -271,22 +306,53 @@ function Skills() {
       name: "Git",
       src: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
     },
+  ] as const
+
+  const groups = [
+    { label: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind"] },
+    { label: "Backend", items: ["Node.js", "Java (Spring)", "REST/GraphQL"] },
+    { label: "Data", items: ["PostgreSQL", "Prisma", "Caching"] },
+    { label: "Ops", items: ["Docker", "K8s", "Vercel/AWS"] },
   ]
+
   return (
-    <Section id="skills" ariaLabel="Skills" className="py-16">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-8">Skills</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    <Section id="skills" ariaLabel="Skills" className="py-12">
+      <div className="mb-6 flex flex-col gap-2">
+        <h2 className="text-2xl sm:text-3xl font-bold">Skills</h2>
+        <p className="text-sm text-zinc-600">
+          A blend of product-focused UI work and pragmatic systems engineering.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-6">
         {skills.map((s) => (
-          <div
+          <span
             key={s.name}
-            className="group flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 transition hover:shadow-md"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-3.5 py-1.5 text-sm text-zinc-700 transition hover:shadow-sm"
           >
             <img
               src={s.src}
               alt={`${s.name} logo`}
-              className="h-10 w-10 opacity-90 group-hover:opacity-100"
+              className="h-6 w-6 opacity-75 grayscale transition"
+              style={{ minWidth: 24, minHeight: 24 }}
             />
-            <span className="text-sm font-medium">{s.name}</span>
+            {s.name}
+          </span>
+        ))}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {groups.map((g) => (
+          <div
+            key={g.label}
+            className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-4"
+          >
+            <p className="text-sm font-semibold mb-2">{g.label}</p>
+            <ul className="text-sm text-zinc-600 space-y-1">
+              {g.items.map((i) => (
+                <li key={i}>• {i}</li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
@@ -294,163 +360,250 @@ function Skills() {
   )
 }
 
-// Project card
-function ProjectCard({
-  title,
-  thumb,
-  desc,
-  stack,
-  github,
-  demo,
-}: {
+/* --- Projects (filterable) --- */
+type Project = {
   title: string
+  cat: "Web" | "Data" | "Infra"
   thumb: string
   desc: string
   stack: string[]
   github?: string
   demo?: string
-}) {
-  return (
-    <article className="group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white">
-      <div className="aspect-[16/9] overflow-hidden">
-        <img
-          src={thumb}
-          alt={`${title} screenshot`}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </div>
-      <div className="p-5">
-        <header className="flex items-start justify-between gap-4">
-          <h3 className="text-lg font-semibold leading-tight">{title}</h3>
-          <div className="flex gap-2 shrink-0">
-            {github && (
-              <a
-                href={github}
-                className="inline-flex items-center gap-1 text-sm hover:text-[var(--accent)] focus-ring"
-                aria-label="GitHub link"
-              >
-                <Github size={18} aria-hidden />
-              </a>
-            )}
-            {demo && (
-              <a
-                href={demo}
-                className="inline-flex items-center gap-1 text-sm hover:text-[var(--accent)] focus-ring"
-                aria-label="Live demo link"
-              >
-                <ExternalLink size={18} aria-hidden />
-              </a>
-            )}
-          </div>
-        </header>
-        <p className="mt-2 text-[var(--muted)] text-sm leading-relaxed">{desc}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {stack.map((t) => (
-            <Badge key={t}>{t}</Badge>
-          ))}
-        </div>
-      </div>
-    </article>
-  )
 }
 
 function Projects() {
-  const projects = [
+  const all: Project[] = [
     {
       title: "Roomer – Find great roommates",
+      cat: "Web",
       thumb:
         "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop",
-      desc: "Listings app with maps, advanced filters, and secure auth. Built for speed and clean UX.",
+      desc: "Listings app with maps, advanced filters, and secure auth.",
       stack: ["Next.js", "React", "Tailwind", "PostgreSQL", "Prisma", "Vercel"],
       github: "https://github.com/placeholder/roomer",
       demo: "https://example.com/roomer",
     },
     {
       title: "TradeOps – Real-time incident search",
+      cat: "Data",
       thumb:
         "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?q=80&w=1200&auto=format&fit=crop",
-      desc: "Unified search across Oracle/MS SQL for rapid root-cause analysis and improved uptime.",
+      desc: "Unified search across Oracle/MS SQL for rapid root-cause analysis.",
       stack: ["Spring Boot", "React", "Oracle", "MS SQL", "Data JPA"],
       github: "https://github.com/placeholder/tradeops",
       demo: "https://example.com/tradeops",
     },
     {
       title: "GridPro – 1M+ row data explorer",
+      cat: "Web",
       thumb:
         "https://images.unsplash.com/photo-1551281044-8f785ba67e45?q=80&w=1200&auto=format&fit=crop",
-      desc: "AG Grid with server-side pagination, lazy loading, and dynamic filtering for massive datasets.",
+      desc: "AG Grid with server-side pagination and dynamic filtering.",
       stack: ["Angular", "AG Grid", "Node", "Kubernetes"],
       github: "https://github.com/placeholder/gridpro",
       demo: "https://example.com/gridpro",
     },
+    {
+      title: "Infra Pipelines — CI/CD",
+      cat: "Infra",
+      thumb:
+        "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop",
+      desc: "Containerized builds, preview deploys, and rollout safety via feature flags.",
+      stack: ["Docker", "GitHub Actions", "K8s", "Vercel"],
+    },
   ]
 
+  const categories = ["All", "Web", "Data", "Infra"] as const
+  const [active, setActive] = useState<(typeof categories)[number]>("All")
+  const filtered = useMemo(
+    () => (active === "All" ? all : all.filter((p) => p.cat === active)),
+    [active]
+  )
+
   return (
-    <Section id="projects" ariaLabel="Projects" className="py-16">
-      <div className="flex items-center justify-between gap-4 mb-6">
+    <Section id="projects" ariaLabel="Projects" className="py-12">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Projects</h2>
-        <a href="#contact" className="text-sm hover:text-[var(--accent)] focus-ring">
-          Need something similar?
-        </a>
+        <div className="flex items-center gap-2 text-sm">
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => setActive(c)}
+              className={`rounded-full border px-3 py-1.5 transition focus-ring ${
+                active === c
+                  ? "bg-[var(--accent)] border-[var(--accent)] text-black"
+                  : "border-[var(--border)] bg-white text-zinc-700 hover:shadow-sm"
+              }`}
+              aria-pressed={active === c}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((p) => (
-          <ProjectCard key={p.title} {...p} />
+
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((p) => (
+          <article
+            key={p.title}
+            className="group relative overflow-hidden rounded-xl border border-[var(--border)] bg-white transition hover:shadow-md"
+          >
+            <div className="aspect-[16/9] overflow-hidden">
+              <img
+                src={p.thumb}
+                alt={`${p.title} screenshot`}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+            </div>
+            <div className="p-4">
+              <header className="flex items-start justify-between gap-3">
+                <h3 className="text-base sm:text-lg font-semibold leading-tight">
+                  {p.title}
+                </h3>
+                <div className="flex gap-2 shrink-0">
+                  {p.github && (
+                    <a
+                      href={p.github}
+                      className="inline-flex items-center gap-1 text-sm text-zinc-700 hover:text-[var(--accent)] focus-ring"
+                      aria-label="GitHub link"
+                    >
+                      <Github size={18} aria-hidden />
+                    </a>
+                  )}
+                  {p.demo && (
+                    <a
+                      href={p.demo}
+                      className="inline-flex items-center gap-1 text-sm text-zinc-700 hover:text-[var(--accent)] focus-ring"
+                      aria-label="Live demo link"
+                    >
+                      <ExternalLink size={18} aria-hidden />
+                    </a>
+                  )}
+                </div>
+              </header>
+              <p className="mt-2 text-zinc-600 text-sm leading-relaxed">{p.desc}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {p.stack.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full bg-[var(--card)] px-2.5 py-1 text-xs text-zinc-600 border border-[var(--border)]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </article>
         ))}
       </div>
     </Section>
   )
 }
 
-// Experience timeline
+/* --- Case Studies --- */
+function CaseStudies() {
+  const cases = [
+    {
+      title: "Checkout Speed: –38% time-to-interactive",
+      result: "Core Web Vitals improved to passing across 95% pages; conversions +6.4%.",
+      bullets: [
+        "Code-splitting & route-level prefetch",
+        "Edge caching of API responses",
+        "Image policy & priority hints",
+      ],
+      link: "#",
+    },
+    {
+      title: "Data Explorer: 1M+ rows under 200ms perceived",
+      result: "Server-side pagination + virtualization reduced bandwidth by 70%.",
+      bullets: [
+        "AG Grid server-mode",
+        "Async chunked filters",
+        "Web workers for transforms",
+      ],
+      link: "#",
+    },
+  ]
+  return (
+    <Section id="case-studies" ariaLabel="Case Studies" className="py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6">Case Studies</h2>
+      <div className="grid gap-5 md:grid-cols-2">
+        {cases.map((c) => (
+          <article
+            key={c.title}
+            className="rounded-xl border border-[var(--border)] bg-white p-5 transition hover:shadow-md"
+          >
+            <div className="flex items-center gap-2 text-zinc-700">
+              <FileText size={18} /> <h3 className="text-lg font-semibold">{c.title}</h3>
+            </div>
+            <p className="mt-2 text-sm text-zinc-600">{c.result}</p>
+            <ul className="mt-3 text-sm text-zinc-700 space-y-1 list-disc ps-5">
+              {c.bullets.map((b) => (
+                <li key={b}>{b}</li>
+              ))}
+            </ul>
+            <a
+              href={c.link}
+              className="mt-4 inline-flex items-center gap-2 text-sm text-zinc-700 hover:text-[var(--accent)] focus-ring"
+            >
+              Read more <ArrowUpRight size={16} />
+            </a>
+          </article>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+/* --- Experience --- */
 function Experience() {
   const items = [
     {
       org: "BNY Mellon",
-      role: "Full Stack Developer – Finance Corporate Services",
+      role: "Full Stack Developer — Finance Corporate Services",
       time: "Sept 2022 – Present",
       bullets: [
-        "Automated batch workflows to cut SLA breaches by ~40% and accelerate reporting cycles.",
-        "Real‑time incident search across Oracle/MS SQL (Spring Data JPA) to speed root‑cause analysis.",
-        "AG Grid UI with server pagination and lazy loading for 1M+ rows; faster loads and less bandwidth.",
+        "Automated batch workflows to reduce SLA breaches ~40% and accelerate reporting cycles.",
+        "Real-time incident search across Oracle/MS SQL with Spring Data JPA.",
+        "AG Grid with server pagination for 1M+ rows; faster loads and lower bandwidth.",
       ],
     },
     {
       org: "Fidelity Investments",
-      role: "Software Engineer – Digital Experience",
+      role: "Software Engineer — Digital Experience",
       time: "Sept 2016 – Nov 2017",
       bullets: [
-        "Revamped IRA interface with Angular + Spring; measurable drop in support call volume.",
-        "Built REST APIs and contributed to a web‑first approach with test‑driven development.",
+        "Revamped IRA interface with Angular + Spring; reduced support call volume.",
+        "Built REST APIs; contributed to TDD and web-first architecture.",
       ],
     },
     {
-      org: "Cambo Box – Cambodian Restaurant",
-      role: "Restauranteur – Owner",
+      org: "Cambo Box (Restaurant)",
+      role: "Owner / Operator",
       time: "May 2018 – Aug 2023",
-      bullets: [
-        "End‑to‑end operations, marketing, and process design; 90%+ customer satisfaction.",
-      ],
+      bullets: ["Operations, marketing, and process design; 90%+ customer satisfaction."],
     },
-  ]
+  ] as const
 
   return (
-    <Section id="experience" ariaLabel="Experience" className="py-16">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-8">Experience</h2>
+    <Section id="experience" ariaLabel="Experience" className="py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6">Experience</h2>
       <ol className="relative border-s border-[var(--border)]">
         {items.map((x, i) => (
-          <li key={i} className="ms-6 pb-8">
+          <li key={i} className="ms-6 pb-7">
             <span
-              className="absolute -start-3 mt-1 h-6 w-6 rounded-full border border-[var(--border)] bg-[var(--card)]"
+              className="absolute -start-3 mt-1 h-5 w-5 rounded-full border border-[var(--border)] bg-[var(--card)]"
               aria-hidden
             />
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-base sm:text-lg font-semibold">
                 {x.role} · {x.org}
               </h3>
-              <time className="text-sm text-[var(--muted)]">{x.time}</time>
+              <time className="flex items-center gap-1 text-sm text-zinc-500">
+                <Calendar size={14} /> {x.time}
+              </time>
             </div>
-            <ul className="mt-2 list-disc ps-5 text-sm text-[var(--muted)] space-y-1">
+            <ul className="mt-2 list-disc ps-5 text-sm text-zinc-600 space-y-1">
               {x.bullets.map((b, j) => (
                 <li key={j}>{b}</li>
               ))}
@@ -462,21 +615,99 @@ function Experience() {
   )
 }
 
-// Contact form (client-only). Replace FORM_ENDPOINT with your service or Next.js API route.
+/* --- Testimonials --- */
+function Testimonials() {
+  const quotes = [
+    {
+      quote:
+        "Johar took our flaky prototype and turned it into a rock-solid app. Measurable impact within weeks.",
+      name: "A. Product Lead",
+      title: "Fintech Platform",
+    },
+    {
+      quote:
+        "Very strong on performance and developer experience. Our build times dropped dramatically.",
+      name: "S. Eng Manager",
+      title: "E-commerce",
+    },
+  ]
+  return (
+    <Section id="testimonials" ariaLabel="Testimonials" className="py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6">Testimonials</h2>
+      <div className="grid gap-5 md:grid-cols-2">
+        {quotes.map((q) => (
+          <figure
+            key={q.quote}
+            className="rounded-xl border border-[var(--border)] bg-white p-5"
+          >
+            <Star className="text-yellow-500" size={18} aria-hidden />
+            <blockquote className="mt-3 text-zinc-700 leading-relaxed">
+              “{q.quote}”
+            </blockquote>
+            <figcaption className="mt-3 text-sm text-zinc-600">
+              {q.name} · {q.title}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+/* --- Credentials (certs/education) --- */
+function Credentials() {
+  const items = [
+    {
+      icon: <Award size={18} />,
+      title: "AWS Certified Cloud Practitioner",
+      org: "Amazon Web Services",
+      year: "2024",
+    },
+    {
+      icon: <Award size={18} />,
+      title: "Scrum Master (PSM I)",
+      org: "Scrum.org",
+      year: "2023",
+    },
+    {
+      icon: <Briefcase size={18} />,
+      title: "B.S. Computer Science",
+      org: "Your University",
+      year: "2016",
+    },
+  ]
+  return (
+    <Section id="credentials" ariaLabel="Credentials" className="py-12">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6">Credentials</h2>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((i) => (
+          <div
+            key={i.title}
+            className="rounded-xl border border-[var(--border)] bg-white p-4"
+          >
+            <div className="flex items-center gap-2 text-zinc-700">
+              {i.icon} <p className="font-semibold">{i.title}</p>
+            </div>
+            <p className="text-sm text-zinc-600">{i.org}</p>
+            <p className="text-xs text-zinc-500 mt-1">{i.year}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+/* --- Contact --- */
 function Contact() {
   const [status, setStatus] = useState<{
     type: "idle" | "ok" | "error"
     message?: string
   }>({ type: "idle" })
-
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = new FormData(e.currentTarget)
-
     try {
-      // Replace with your endpoint, e.g., "/api/contact" (Next.js) or a Formspree URL
-      const FORM_ENDPOINT = "/api/contact" // TODO: implement server handler
-      const res = await fetch(FORM_ENDPOINT, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { Accept: "application/json" },
         body: JSON.stringify({
@@ -487,8 +718,8 @@ function Contact() {
       })
       if (!res.ok) throw new Error("Request failed")
       setStatus({ type: "ok", message: "Thanks! I'll get back to you soon." })
-      e.currentTarget.reset()
-    } catch (err) {
+      ;(e.currentTarget as HTMLFormElement).reset()
+    } catch {
       setStatus({
         type: "error",
         message: "Something went wrong. Email me directly instead.",
@@ -497,12 +728,20 @@ function Contact() {
   }
 
   return (
-    <Section id="contact" ariaLabel="Contact" className="py-16">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6">Contact</h2>
-      <div className="grid md:grid-cols-2 gap-8">
+    <Section id="contact" ariaLabel="Contact" className="py-12">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <h2 className="text-2xl sm:text-3xl font-bold">Contact</h2>
+        <a
+          href="mailto:you@email.com"
+          className="hidden md:inline-flex items-center gap-2 text-sm text-zinc-700 hover:text-[var(--accent)] focus-ring"
+        >
+          <Mail size={16} /> Email
+        </a>
+      </div>
+      <div className="grid gap-8 md:grid-cols-2">
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6"
+          className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5"
         >
           <div className="grid gap-4">
             <div>
@@ -544,9 +783,9 @@ function Contact() {
             </div>
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-3 font-semibold text-black shadow-sm transition hover:translate-y-[-1px] focus-ring"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:-translate-y-0.5 focus-ring"
             >
-              Send <Mail size={18} aria-hidden />
+              Send <ArrowUpRight size={16} aria-hidden />
             </button>
             {status.type !== "idle" && (
               <p
@@ -561,10 +800,10 @@ function Contact() {
           </div>
         </form>
 
-        <div className="space-y-6">
-          <p className="text-[var(--muted)] leading-relaxed">
-            Want to collaborate, hire me, or just say hello? Reach out via the form, or
-            connect on social.
+        <div className="space-y-5">
+          <p className="text-zinc-600 leading-relaxed">
+            Want to collaborate or hire me? Let’s talk about your goals and how we can
+            ship confidently.
           </p>
           <ul className="space-y-3" aria-label="Social links">
             <li>
@@ -607,14 +846,18 @@ function Contact() {
   )
 }
 
+/* --- Footer --- */
 function Footer() {
   return (
-    <footer className="mt-20 border-t border-[var(--border)]">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-[var(--muted)]">
-          © {new Date().getFullYear()} Johar R Warsol. All rights reserved.
+    <footer className="mt-16 border-t border-[var(--border)]">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-5 py-8 sm:flex-row sm:px-6 lg:px-8">
+        <p className="text-sm text-zinc-500">
+          © {new Date().getFullYear()} Johar R Warsol.
         </p>
-        <a href="#home" className="text-sm hover:text-[var(--accent)] focus-ring">
+        <a
+          href="#home"
+          className="text-sm text-zinc-700 hover:text-[var(--accent)] focus-ring"
+        >
           Back to top
         </a>
       </div>
@@ -622,9 +865,11 @@ function Footer() {
   )
 }
 
-export default function PortfolioPage() {
+/* --- Page --- */
+export default function Page() {
   return (
-    <main className="relative" role="main">
+    <main className="relative">
+      {/* Keep the palette in globals.css; ensure :root vars exist there */}
       <a
         href="#about"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:bg-white focus:text-black focus:px-3 focus:py-2 focus:ring-4 focus:ring-[var(--accent)] focus:rounded-md"
@@ -634,9 +879,13 @@ export default function PortfolioPage() {
       <ThemeStyles />
       <Navbar />
       <Hero />
+      <Services />
       <Skills />
       <Projects />
+      <CaseStudies />
       <Experience />
+      <Testimonials />
+      <Credentials />
       <Contact />
       <Footer />
     </main>

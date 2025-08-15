@@ -2,8 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* You can add custom global styles here */
-html,
-body {
+/* Base tweaks */
+html {
   scroll-behavior: smooth;
+}
+:root {
+  --bg: #ffffff;
+  --text: #0b0b0b;
+  --muted: #6b7280; /* gray-500 */
+  --card: #fafafa; /* zinc-50 */
+  --border: #e6e6e6; /* neutral border */
+  --accent: #12d6ff; /* softer electric blue */
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  line-height: 1.6;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text);
 }
